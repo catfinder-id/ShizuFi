@@ -8,13 +8,17 @@ Untuk preview lokal tanpa database: `python -m http.server 4173`, lalu buka http
 
 ## Cara menggunakan
 
+Navigasi **Ringkasan / Akun / Aktivitas / Pengaturan** berada di sidebar desktop dan bagian bawah layar HP. Tampilan memakai kartu akun, warna lembut, dan alur transaksi yang terinspirasi Ivy Wallet; implementasi web dibuat untuk ShizuFi dengan backend PHP/MySQL yang sudah ada.
+
+Pintasan **Pemasukan / Pengeluaran / Transfer** langsung membuka form sesuai jenisnya. Tombol **+ Transaksi** (atau tombol mengambang **+** di HP) menampilkan pilihan jenis transaksi. Tombol **Transaksi** pada kartu akun memilih akun tersebut untuk pengeluaran; jenisnya bisa diganti di form. Backup, impor data browser, logout, dan mode gelap berada di **Pengaturan**. Preferensi tema hanya disimpan di browser; tidak mengubah data workspace.
+
 1. **+ Akun / emas → Akun / wallet**: buat bank, cash, e-wallet, investment account, credit card, loan atau other. Pilih mata uang dan saldo awal. Utang memakai saldo negatif.
 2. **+ Akun / emas → Kepemilikan awal emas**: pilih akun investasi, nama instrumen, berat, kemurnian, dan modal. Saldo awal emas tidak mengurangi kas. Berat 0 mendaftarkan instrumen baru tanpa posisi / modal.
 3. **+ Transaksi**: catat pemasukan, pengeluaran, transfer, beli/jual emas, atau koreksi saldo. Buat kategori pemasukan / pengeluaran melalui kolom kategori baru.
 4. Transfer satu mata uang mencatat keluar dan masuk dalam satu transaksi. Untuk mata uang berbeda, isi jumlah sumber dan jumlah yang benar-benar diterima; kurs pasar tidak mengubah nominal transaksi historis.
 5. Pembelian emas mengurangi kas IDR sebesar nilai bruto + biaya + pajak. Penjualan menambah kas sebesar nilai bruto − biaya − pajak. Instrumen harus terdaftar terlebih dahulu.
 6. Edit akun dapat mengubah nama, catatan dan saldo; perubahan saldo membuat entri koreksi. Jenis akun, mata uang dan institusi tidak berubah melalui edit. Arsip tersedia hanya setelah saldo dan seluruh posisi kosong. Riwayat tidak dihapus.
-7. Klik riwayat transaksi untuk melihat entri ledger. Ringkasan menampilkan 50 transaksi terbaru; backup berisi seluruh transaksi.
+7. Klik riwayat transaksi untuk melihat entri ledger. Ringkasan dan Aktivitas menampilkan 50 transaksi terbaru; backup berisi seluruh transaksi. Nominal transfer di riwayat menunjukkan jumlah keluar dari akun sumber, bukan perubahan total aset. Beli/jual emas menunjukkan arus kas termasuk biaya dan pajak.
 
 Biaya pembelian termasuk dalam modal. Modal menggunakan rata-rata tertimbang; penjualan sebagian mengeluarkan modal secara proporsional. Penjualan melebihi stok pada tanggal transaksi ditolak. Modal yang tidak diketahui tetap ditandai tidak diketahui dan tidak menghasilkan estimasi laba yang menyesatkan. Catatan diproses sesuai tanggal transaksi, kemudian urutan pencatatan untuk timestamp yang sama. Transaksi tanggal mendatang juga merupakan catatan aktif; tidak ada fitur penjadwalan.
 
