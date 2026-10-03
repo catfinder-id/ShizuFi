@@ -1,0 +1,15 @@
+# Private data and local credentials
+shizufi-backup-*.json
+*backup*.json
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Local tools and generated artifacts
+node_modules/
+__pycache__/
+.sites-runtime/
+.DS_Store
+Thumbs.db
