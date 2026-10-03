@@ -1,10 +1,10 @@
 # ShizuFi
 
-Web keuangan pribadi berbasis HTML, CSS, dan JavaScript, tanpa PHP / proses build. Versi ini mengikuti struktur workspace → akun → transaksi + ledger, dan akun investasi → instrumen → transaksi investasi → posisi. Cakupan aktif: fiat dan emas.
+Web keuangan pribadi dengan frontend HTML, CSS, JavaScript dan backend PHP + MySQL untuk shared hosting. Tidak memerlukan Node.js / proses build. Struktur: workspace → akun → transaksi + ledger, dan akun investasi → instrumen → transaksi investasi → posisi. Cakupan aktif: fiat dan emas.
 
 ## Jalankan
 
-`python -m http.server 4173`, lalu buka http://localhost:4173. Tetap gunakan alamat/origin yang sama karena penyimpanan terpisah per browser dan origin.
+Untuk preview lokal tanpa database: `python -m http.server 4173`, lalu buka http://localhost:4173. Untuk hosting dengan database, ikuti [HOSTINGER.md](HOSTINGER.md). Mode server memerlukan login dan tidak beralih otomatis ke localStorage ketika API gagal.
 
 ## Cara menggunakan
 
@@ -20,13 +20,13 @@ Biaya pembelian termasuk dalam modal. Modal menggunakan rata-rata tertimbang; pe
 
 ## Penyimpanan
 
-Satu pemilik lokal dan satu workspace personal, base currency IDR, timezone Asia/Jakarta. Tidak ada autentikasi / password, server database, sinkronisasi perangkat, atau koneksi bank. `users` lokal berfungsi sebagai identitas pencatat; bukan akun login. Skema relasi dan pemetaan ada di [SCHEMA.md](SCHEMA.md).
+Satu pemilik dan satu workspace personal, base currency IDR, timezone Asia/Jakarta. Di hosting, login email/password memakai session PHP; data disimpan dalam MySQL dan dapat diakses pada perangkat lain setelah login. Tidak ada koneksi bank. Preview localhost tetap lokal tanpa login. Skema dan pemetaan ada di [SCHEMA.md](SCHEMA.md).
 
-Data menggunakan localStorage `shizufi.v2` dalam bentuk tabel logis JSON. Nominal transaksi berupa integer minor unit (IDR / JPY tanpa desimal, mata uang lain dua desimal). Berat berupa integer microgram (1 gram = 1.000.000 microgram). Nominal dibulatkan ke minor unit dan berat ke microgram saat input. Harga pasar dan estimasi valuasi menggunakan angka pecahan JavaScript; bukan mesin settlement NUMERIC(28,12).
+MySQL menyimpan tabel relasional dan snapshot JSON backup v2 secara atomik. Nominal transaksi berupa integer minor unit (IDR / JPY tanpa desimal, mata uang lain dua desimal). Berat berupa integer microgram (1 gram = 1.000.000 microgram). Nominal dibulatkan ke minor unit dan berat ke microgram saat input. Harga pasar/valuasi menggunakan angka pecahan JavaScript; bukan mesin settlement NUMERIC(28,12). Preview lokal menggunakan localStorage `shizufi.v2`.
 
-Posisi disimpan sebagai cache materialisasi, dihitung ulang saat perubahan transaksi dan impor / pemuatan untuk menjaga integritas. Pembaruan harga tidak menghitung ulang posisi. Saldo akun merupakan jumlah entri ledger. Penyimpanan lokal ini dibatasi untuk penggunaan pribadi, bukan jutaan transaksi.
+Posisi disimpan sebagai cache materialisasi. Backend memvalidasi seluruh ledger dan membangun ulang posisi setiap save, termasuk pembaruan harga. Saldo akun adalah jumlah entri ledger. Versi server ini melakukan sinkronisasi ulang tabel workspace dalam satu transaksi, dengan batas 10.000 record per tabel dan payload 8 MB; cocok untuk pribadi, bukan jutaan transaksi. Revision lock menolak perubahan dari perangkat yang memegang versi lama. Reload untuk mengambil data terbaru; belum ada realtime push.
 
-Backup v1 otomatis dimigrasikan saat v2 belum tersedia. Fiat menjadi saldo awal akun; emas menjadi kepemilikan awal akun investasi. Kemurnian, catatan, modal dan cache pasar dipertahankan. Timestamp migrasi menjadi tanggal saldo awal karena v1 tidak menyimpan transaksi pembelian. Log aktivitas edit lama tetap berada dalam data v1 dan tidak diubah menjadi transaksi. Key v1 tidak dihapus.
+Backup v1 dimigrasikan menjadi v2 saat impor. Pada preview lokal, migrasi otomatis dilakukan saat v2 belum tersedia. Pada mode server, impor backup atau gunakan tombol impor data browser setelah login. Fiat menjadi saldo awal akun; emas menjadi kepemilikan awal akun investasi. Kemurnian, catatan, modal dan cache pasar dipertahankan. Timestamp migrasi menjadi tanggal saldo awal karena v1 tidak menyimpan transaksi pembelian. Log aktivitas edit lama tetap berada dalam key v1 dan tidak diubah menjadi transaksi. Key lokal tidak dihapus.
 
 Ekspor backup sebelum memindahkan alamat, membersihkan site data, atau mengganti perangkat. Impor mengganti seluruh workspace setelah konfirmasi. Backup yang ledger-nya tidak seimbang, referensinya rusak, atau penjualannya melebihi stok ditolak. Cache posisi backup dihitung ulang. Jika data lokal gagal dibaca, penyimpanan otomatis berhenti agar data tidak ditimpa.
 
@@ -42,18 +42,15 @@ Setiap dibuka / tombol Perbarui ditekan:
 
 Harga spot bukan retail / buyback Antam atau Pegadaian. Timestamp harga dan kurs ditampilkan. Jika API gagal, cache diberi label; aset tanpa harga ditandai belum dinilai dan total disebut sementara. Harga manual diganti spot saat pembaruan otomatis berhasil. Harga instrumen dan kurs tersimpan terpisah dari transaksi historis. Tidak ada API key.
 
-## GitHub Pages
+## Deployment
 
-1. Buat repository **public**, misalnya ShizuFi.
-2. Upload `index.html`, `style.css`, `model.js`, `app.js`, `favicon.svg`, `.nojekyll` ke root branch main. Jangan upload backup keuangan.
-3. **Settings → Pages → Build and deployment → Deploy from a branch → main → /(root) → Save**.
-4. Buka `https://USERNAME.github.io/ShizuFi/` setelah deployment selesai.
+Repository: https://github.com/catfinder-id/ShizuFi. Hostinger mengambil kode dari branch main melalui auto-deploy. Frontend, cloud.js dan folder api harus ikut deploy. Impor SQL dan buat konfigurasi privat sesuai [HOSTINGER.md](HOSTINGER.md); konfigurasi dan database tidak dikelola melalui Git. Data localhost dipindahkan melalui ekspor/impor backup.
 
-Repository tujuan: https://github.com/catfinder-id/ShizuFi. Setelah GitHub Pages aktif, alamat webnya https://catfinder-id.github.io/ShizuFi/. File web publik tidak menyertakan data keuangan lokal. Siapa pun yang memiliki akses ke profil browser dapat membaca data lokal. Data localhost tidak otomatis berpindah ke alamat GitHub Pages; gunakan ekspor / impor backup.
+GitHub Pages tidak mendukung PHP dan tidak bisa menjalankan mode database ini. Repository hanya berisi kode/contoh konfigurasi, tidak berisi backup, password MySQL atau session pengguna.
 
 ## Verifikasi
 
-`node --check model.js`, `node --check app.js`, dan `node --test --test-isolation=none tests/app.test.cjs`.
+`node --check model.js`, `node --check app.js`, `node --check cloud.js`, dan `node --test --test-isolation=none tests/app.test.cjs tests/cloud.test.cjs`. Pemeriksaan PHP dan domain ada di HOSTINGER.md.
 
 Pengujian mencakup presisi minor unit, transfer satu / lintas mata uang, beli/jual emas dengan biaya dan pajak, modal rata-rata dan laba terealisasi, stok negatif / transaksi mundur, koreksi, arsip, integritas backup, migrasi v1, pembaruan pasar, dan valuasi kemurnian. Preview browser memverifikasi migrasi catatan yang ada dan pergantian form transaksi emas.
 

@@ -1,0 +1,7 @@
+Options -Indexes
+<Files "domain.php">
+ Require all denied
+</Files>
+<Files "storage.php">
+ Require all denied
+</Files>

@@ -6,6 +6,9 @@ shizufi-backup-*.json
 !.env.example
 *.pem
 *.key
+shizufi-config.php
+config.local.php
+.php-runtime/
 
 # Local tools and generated artifacts
 node_modules/
